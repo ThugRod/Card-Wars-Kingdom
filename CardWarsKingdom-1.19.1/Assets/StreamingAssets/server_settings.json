@@ -1,6 +1,6 @@
 {
     "type" : "server_settings",
-    "server_url" : "https://cwk.retroretreat.net/",
+    "server_url" : "https://thugrod.pythonanywhere.com/",
     "local_server_url" : "http://127.0.0.1:8000/",
     "photon_chat_app_id": "",
     "photon_pun_app_id": ""

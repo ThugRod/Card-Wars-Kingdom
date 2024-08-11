@@ -655,12 +655,17 @@ public class CreatureData : ILoadableData
 		_EvolveCost = TFUtils.LoadInt(dict, "EvoCost", 0);
 		_ScriptName = TFUtils.LoadString(dict, "ScriptName", string.Empty);
 		_Faction = (CreatureFaction)(int)Enum.Parse(typeof(CreatureFaction), TFUtils.LoadString(dict, "Faction", string.Empty), true);
+    	_Faction = TFUtils.LoadEnum(dict, "Faction", CreatureFaction.None);
+    	_Type = TFUtils.LoadEnum(dict, "Type", CreatureType.None);		
 		_Type = (CreatureType)(int)Enum.Parse(typeof(CreatureType), TFUtils.LoadString(dict, "Type", "None"), true);
 		CardSlots = TFUtils.LoadInt(dict, "CardSlots", 0);
 		string text = TFUtils.LoadString(dict, "CardToCreate", string.Empty);
 		text = text.Replace("ActionCard", string.Empty);
 		_CardToCreate = ((!(text == string.Empty)) ? (int.Parse(text) - 1) : (-1));
 		_ChargeTime = (float)TFUtils.LoadInt(dict, "ChargeFrame", 0) / 30f;
+		_ShootTravelStyle = TFUtils.LoadEnum(dict, "ShootTravelStyle", iTween.EaseType.linear);
+    	_AttackMovementStyle = TFUtils.LoadEnum(dict, "AttackTravelStyle", iTween.EaseType.linear);
+    	_MetaSpecial = TFUtils.LoadEnum(dict, "MetaSpecial", MetaSpecial.None);
 		_ShootStartTime = (float)TFUtils.LoadInt(dict, "ShootStartFrame", 0) / 30f;
 		_ShootTravelTime = (float)TFUtils.LoadInt(dict, "ShootTravelFrames", 0) / 30f;
 		_AttackStartTime = (float)TFUtils.LoadInt(dict, "AttackStartFrame", 0) / 30f;
@@ -680,6 +685,7 @@ public class CreatureData : ILoadableData
 		SellPrice = TFUtils.LoadInt(dict, "SellPrice", 0);
 		_TutorialOnly = TFUtils.LoadBool(dict, "TutorialOnly", false);
 		CreatureNumber = TFUtils.LoadInt(dict, "Number", -1);
+		_Style = TFUtils.LoadEnum(dict, "AttackStyle", AttackStyle.None);
 		HideInMuseum = TFUtils.LoadBool(dict, "HideInMuseum", false);
 		BlockFromRandomDungeons = TFUtils.LoadBool(dict, "BlockFromRandomDungeons", false);
 		Rarity = TFUtils.LoadInt(dict, "Rarity", 1);

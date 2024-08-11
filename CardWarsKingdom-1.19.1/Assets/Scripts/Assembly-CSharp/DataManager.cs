@@ -78,12 +78,31 @@ public abstract class DataManager<T> : IDataManager where T : ILoadableData
 
 	private void CheckAndThrowExeptions()
 	{
-		if (ex != null)
-		{
-			PrintException(ex);
-			throw ex;
-		}
+    	if (ex != null)
+    	{
+        	StringBuilder errorMessage = new StringBuilder();
+        	errorMessage.AppendLine("An error occurred while loading data:");
+        	errorMessage.AppendLine(ex.Message);
+        	errorMessage.AppendLine("Stack trace:");
+        	errorMessage.AppendLine(ex.StackTrace);
+
+        	if (ex.Data.Contains("Filename"))
+        	{
+            	errorMessage.AppendLine($"Filename: {ex.Data["Filename"]}");
+        	}
+
+        	if (ex.Data.Contains("JSON"))
+        	{
+            	errorMessage.AppendLine("JSON data (first 1000 characters):");
+            	errorMessage.AppendLine(ex.Data["JSON"].ToString().Substring(0, Math.Min(1000, ex.Data["JSON"].ToString().Length)));
+        	}
+
+        	Debug.LogError(errorMessage.ToString());
+
+        	throw new Exception("Data loading error. Check logs for details.", ex);
+    	}
 	}
+
 
 	public IEnumerator Load()
 	{
@@ -108,28 +127,47 @@ public abstract class DataManager<T> : IDataManager where T : ILoadableData
 			}
 			CheckAndThrowExeptions();
 		}
-		WWW www = new WWW(FilePath);
-		while (!www.isDone)
-		{
-			yield return null;
-		}
-		string jsonText = www.text;
-		LoadAndParseJsonDataThread(null, jsonText);
-		while (!doneLoadingAndParsingJsonData && !ExceptionThrown)
-		{
-			yield return null;
-		}
-		CheckAndThrowExeptions();
-		IsLoaded = true;
-		new Thread((ThreadStart)delegate
-		{
-			PostLoadThread();
-		}).Start();
-		while (!donePostLoad && !ExceptionThrown)
-		{
-			yield return null;
-		}
-		CheckAndThrowExeptions();
+    	WWW www = new WWW(FilePath);
+    	float startTime = Time.time;
+    	while (!www.isDone)
+    	{
+        	if (Time.time - startTime > 30f) // 30 seconds timeout
+        	{
+            	Debug.LogError($"Timeout while loading data from {FilePath}");
+            	yield break;
+        	}
+        	yield return null;
+    	}
+
+    	if (!string.IsNullOrEmpty(www.error))
+    	{
+        	Debug.LogError($"Error loading data from {FilePath}: {www.error}");
+        	yield break;
+    	}
+
+    	string jsonText = www.text;
+    	if (string.IsNullOrEmpty(jsonText))
+    	{
+        	Debug.LogError($"Received empty data from {FilePath}");
+        	yield break;
+    	}
+
+    	LoadAndParseJsonDataThread(FilePath, jsonText);
+			while (!doneLoadingAndParsingJsonData && !ExceptionThrown)
+			{
+				yield return null;
+			}
+			CheckAndThrowExeptions();
+			IsLoaded = true;
+			new Thread((ThreadStart)delegate
+			{
+				PostLoadThread();
+			}).Start();
+			while (!donePostLoad && !ExceptionThrown)
+			{
+				yield return null;
+			}
+			CheckAndThrowExeptions();
 	}
 
 	private void loadDependencyThread(IDataManager manager)
@@ -156,35 +194,63 @@ public abstract class DataManager<T> : IDataManager where T : ILoadableData
 		LoadAndParseJsonDataThread(appliedFilePath, null);
 	}
 
-	private void LoadAndParseJsonDataThread(string appliedFilePath, string wwwText)
-	{
-		lock (threadLock)
-		{
-			try
-			{
-				doneLoadingAndParsingJsonData = false;
-				try
-				{
-					List<object> jlist = (List<object>)Json.Deserialize(wwwText);
-					ParseRows(jlist);
-					doneLoadingAndParsingJsonData = true;
-				}
-				catch
-				{
-					List<object> list = new List<object>();
-					object item = Json.Deserialize(wwwText);
-					list.Add(item);
-					ParseRows(list);
-					doneLoadingAndParsingJsonData = true;
-				}
-			}
-			catch (Exception ex)
-			{
-				ex.Data.Add("Filename", appliedFilePath);
-				this.ex = ex;
-			}
-		}
-	}
+private void LoadAndParseJsonDataThread(string appliedFilePath, string wwwText)
+{
+    lock (threadLock)
+    {
+        try
+        {
+            doneLoadingAndParsingJsonData = false;
+
+            if (string.IsNullOrEmpty(wwwText))
+            {
+                throw new Exception("Received empty or null JSON data.");
+            }
+
+            object deserializedData;
+            try
+            {
+                deserializedData = Json.Deserialize(wwwText);
+            }
+            catch (Exception jsonEx)
+            {
+                Debug.LogError($"Error deserializing JSON: {jsonEx.Message}");
+                Debug.LogError($"JSON text (first 1000 characters): {wwwText.Substring(0, Math.Min(1000, wwwText.Length))}");
+                throw;
+            }
+
+            List<object> jlist;
+            if (deserializedData is List<object>)
+            {
+                jlist = (List<object>)deserializedData;
+            }
+            else if (deserializedData is Dictionary<string, object>)
+            {
+                jlist = new List<object> { deserializedData };
+            }
+            else
+            {
+                throw new Exception($"Unexpected deserialized data type: {deserializedData?.GetType().Name ?? "null"}");
+            }
+
+            if (jlist == null || jlist.Count == 0)
+            {
+                throw new Exception("Deserialized JSON resulted in a null or empty list.");
+            }
+
+            ParseRows(jlist);
+            doneLoadingAndParsingJsonData = true;
+        }
+        catch (Exception ex)
+        {
+            ex.Data.Add("Filename", appliedFilePath);
+            ex.Data.Add("JSON", wwwText);
+            this.ex = ex;
+        }
+    }
+}
+
+
 
 	private void PostLoadThread()
 	{
@@ -205,18 +271,55 @@ public abstract class DataManager<T> : IDataManager where T : ILoadableData
 
 	protected virtual void ParseRows(List<object> jlist)
 	{
-		foreach (object item in jlist)
-		{
-			Dictionary<string, object> dict = (Dictionary<string, object>)item;
-			T val = (T)Activator.CreateInstance(typeof(T));
-			val.Populate(dict);
-			if (val.ID != string.Empty && !Database.ContainsKey(val.ID))
-			{
-				Database.Add(val.ID, val);
-			}
-			DatabaseArray.Add(val);
-		}
+    	if (jlist == null)
+    	{
+        	Debug.LogError("ParseRows received a null jlist.");
+        	return;
+    	}
+
+    	for (int i = 0; i < jlist.Count; i++)
+   		{
+        	object item = jlist[i];
+        	try
+        	{
+            	if (!(item is Dictionary<string, object> dict))
+            	{
+                	Debug.LogWarning($"Skipping item {i}: not a dictionary. Item type: {item?.GetType().Name ?? "null"}");
+                	continue;
+            	}
+
+            	T val = (T)Activator.CreateInstance(typeof(T));
+            	val.Populate(dict);
+
+            	if (string.IsNullOrEmpty(val.ID))
+            	{
+                	Debug.LogWarning($"Skipping item {i}: ID is null or empty. Item data: {Json.Serialize(dict)}");
+                	continue;
+            	}
+
+            	if (!Database.ContainsKey(val.ID))
+            	{
+                	Database.Add(val.ID, val);
+            	}
+            	else
+            	{
+                	Debug.LogWarning($"Duplicate ID found: {val.ID}. Skipping this item.");
+            	}
+
+            	DatabaseArray.Add(val);
+        	}
+        	catch (Exception ex)
+        	{
+            	Debug.LogError($"Error parsing row {i}: {ex.Message}");
+            	Debug.LogError($"Problematic data: {Json.Serialize(item)}");
+            	Debug.LogError($"Stack trace: {ex.StackTrace}");
+            	// Store the exception for later handling
+            	this.ex = ex;
+        	}
+    	}
 	}
+
+
 
 	protected virtual void PostLoad()
 	{
@@ -224,10 +327,7 @@ public abstract class DataManager<T> : IDataManager where T : ILoadableData
 
 	public void AddDependency(IDataManager manager)
 	{
-		if (Dependencies == null)
-		{
-			Dependencies = new List<IDataManager>();
-		}
+		Dependencies ??= new List<IDataManager>();
 		Dependencies.Add(manager);
 	}
 
