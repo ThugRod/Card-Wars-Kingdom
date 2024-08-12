@@ -6,6 +6,5 @@ public enum CreatureFaction
 	Blue,
 	Dark,
 	Light,
-	Count,
-    None
+	Count
 }

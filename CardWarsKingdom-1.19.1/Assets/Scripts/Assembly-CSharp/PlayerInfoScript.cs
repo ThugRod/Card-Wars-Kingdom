@@ -165,7 +165,7 @@ public class PlayerInfoScript : Singleton<PlayerInfoScript>
 
 	public bool IsInitialized { get; protected set; }
 
-	public string Crooz_projID
+	public string crooz_projID
 	{
 		get
 		{
@@ -173,7 +173,7 @@ public class PlayerInfoScript : Singleton<PlayerInfoScript>
 		}
 	}
 
-	public string Crooz_supportID
+	public string crooz_supportID
 	{
 		get
 		{
@@ -230,7 +230,7 @@ public class PlayerInfoScript : Singleton<PlayerInfoScript>
 
 	public string GetSupportLink()
 	{
-		return MiscParams.CompassSupportURL + "?project_id=" + Crooz_projID + "&support_id=" + Crooz_supportID + "&p=" + crooz_p + "&k=" + GetCroozLoginKey();
+		return MiscParams.CompassSupportURL + "?project_id=" + crooz_projID + "&support_id=" + crooz_supportID + "&p=" + crooz_p + "&k=" + GetCroozLoginKey();
 	}
 
 	public string GetFormattedPlayerCode()
@@ -509,8 +509,8 @@ public class PlayerInfoScript : Singleton<PlayerInfoScript>
 		{
 			string playerCode = GetPlayerCode();
 			string text = DateTimeOffset.UtcNow.ToString("yyyyMMdd");
-			string sourcevalue = Crooz_projID + "_" + Crooz_supportID + "_" + playerCode + "_" + text;
-			SessionManager.Instance.theSession.Server.CompassSupportLogin(Crooz_projID, Crooz_supportID, crooz_p, playerCode, Singleton<PlayerInfoScript>.Instance.SaveData.GetSHA256STRINGASCII(sourcevalue).ToLower(), crooz_logincallback);
+			string sourcevalue = crooz_projID + "_" + crooz_supportID + "_" + playerCode + "_" + text;
+			SessionManager.Instance.theSession.Server.CompassSupportLogin(crooz_projID, crooz_supportID, crooz_p, playerCode, Singleton<PlayerInfoScript>.Instance.SaveData.GetSHA256STRINGASCII(sourcevalue).ToLower(), crooz_logincallback);
 		}
 	}
 

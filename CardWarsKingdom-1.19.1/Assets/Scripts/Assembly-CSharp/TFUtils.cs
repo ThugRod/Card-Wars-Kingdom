@@ -37,21 +37,11 @@ public class TFUtils
 		}
 	}
 
-    public static bool TryParseDateTime(string dateString, out DateTime result)
-    {
-        result = DateTime.MinValue;
-        if (string.IsNullOrEmpty(dateString))
-            return false;
-
-        string[] formats = { "dd/MM/yyyy", "MM/dd/yyyy", "yyyy-MM-dd", "yyyy/MM/dd" };
-        return DateTime.TryParseExact(dateString, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
-    }	
-
 	public static void Init(string fbid)
 	{
 		DeviceID = Guid.NewGuid().ToString().Replace("-", string.Empty);
 		DeviceName = SystemInfo.deviceName;
-		FacebookID = (fbid != null) ? fbid : DeviceID;
+		FacebookID = ((fbid != null) ? fbid : DeviceID);
         UnityEngine.Debug.Log("This device is:" + DeviceID + " / Player ID is:" + FacebookID);
 		AmazonDevice = false;
 	}
@@ -229,42 +219,28 @@ public class TFUtils
 		return (Dictionary<string, object>)data[key];
 	}
 
-		public static string LoadString(Dictionary<string, object> data, string key)
-	{
-    	return LoadString(data, key, string.Empty);
-	}
-
 	public static string LoadString(Dictionary<string, object> data, string key, string defaultValue)
 	{
-    	if (TryLoadString(data, key, out string result))
-    	{
-        	return string.IsNullOrEmpty(result) ? defaultValue : result;
-    	}
-    	return defaultValue;
+		string text = TryLoadString(data, key);
+		if (text == null || text == string.Empty)
+		{
+			text = defaultValue;
+		}
+		return text;
+	}
+
+	public static string LoadString(Dictionary<string, object> data, string key)
+	{
+		return AssertCast<string>(data, key);
 	}
 
 	public static string TryLoadString(Dictionary<string, object> data, string key)
 	{
-    	TryLoadString(data, key, out string result);
-    	return result;
-	}
-
-	public static bool TryLoadString(Dictionary<string, object> data, string key, out string result)
-	{
-    	result = null;
-
-    	if (data == null || key == null)
-    	{
-        	return false;
-    	}
-
-    	if (data.TryGetValue(key, out object value))
-    	{
-        	result = value?.ToString();
-        	return true;
-    	}
-
-    	return false;
+		if (data.ContainsKey(key))
+		{
+			return AssertCast<string>(data, key);
+		}
+		return null;
 	}
 
 	public static string LoadLocalizedString(Dictionary<string, object> data, string key, string defaultValue)
@@ -279,11 +255,7 @@ public class TFUtils
 
 	public static string TryLoadLocalizedString(Dictionary<string, object> data, string key)
 	{
-    	if (TryLoadString(data, key, out string result))
-    	{
-        	return KFFLocalization.Get(result);
-    	}
-    	return string.Empty; // or return null, depending on your preference
+		return KFFLocalization.Get(TryLoadString(data, key));
 	}
 
 	public static string LoadNullableString(Dictionary<string, object> data, string key)
@@ -358,7 +330,7 @@ public class TFUtils
 
 	public static bool LoadBoolAsInt(Dictionary<string, object> d, string key, bool defaultValue)
 	{
-		int defaultValue2 = defaultValue ? 1 : 0;
+		int defaultValue2 = (defaultValue ? 1 : 0);
 		return (LoadInt(d, key, defaultValue2) != 0) ? true : false;
 	}
 
@@ -371,7 +343,7 @@ public class TFUtils
 			object obj = d[key];
 			if (obj is int)
 			{
-				result = ((int)obj != 0) ? true : false;
+				result = (((int)obj != 0) ? true : false);
 			}
 			else if (obj is string)
 			{
@@ -414,63 +386,19 @@ public class TFUtils
 		return LoadIntHelper(d, key);
 	}
 
-    public static int LoadInt(Dictionary<string, object> d, string key, int defaultValue)
-    {
-        if (d == null)
-        {
-            UnityEngine.Debug.LogWarning($"LoadInt: Dictionary is null when trying to load key '{key}'. Using default value {defaultValue}.");
-            return defaultValue;
-        }
-
-        if (!d.TryGetValue(key, out object obj))
-        {
-            UnityEngine.Debug.LogWarning($"LoadInt: Key '{key}' not found in dictionary. Using default value {defaultValue}.");
-            return defaultValue;
-        }
-
-        if (obj == null)
-        {
-            UnityEngine.Debug.LogWarning($"LoadInt: Value for key '{key}' is null. Using default value {defaultValue}.");
-            return defaultValue;
-        }
-
-        if (obj is int intValue)
-        {
-            return intValue;
-        }
-
-        if (obj is long longValue)
-        {
-            return (int)longValue;
-        }
-
-        if (obj is float floatValue)
-        {
-            return (int)Math.Floor(floatValue + 0.5f);
-        }
-
-        if (obj is double doubleValue)
-        {
-            return (int)Math.Floor(doubleValue + 0.5);
-        }
-
-        if (obj is string stringValue)
-        {
-            if (string.IsNullOrEmpty(stringValue))
-            {
-                UnityEngine.Debug.LogWarning($"LoadInt: Empty string value for key '{key}'. Using default value {defaultValue}.");
-                return defaultValue;
-            }
-
-            if (int.TryParse(stringValue, out int parsedValue))
-            {
-                return parsedValue;
-            }
-        }
-
-        UnityEngine.Debug.LogWarning($"LoadInt: Failed to parse value for key '{key}'. Type: {obj.GetType().Name}. Using default value {defaultValue}.");
-        return defaultValue;
-    }
+	public static int LoadInt(Dictionary<string, object> d, string key, int defaultValue)
+	{
+		int result = defaultValue;
+		if (d.ContainsKey(key))
+		{
+			object obj = d[key];
+			if (!(obj is string) || ((string)obj).Length > 0)
+			{
+				result = (int)Math.Floor(Convert.ToSingle(obj, CultureInfo.InvariantCulture) + 0.5f);
+			}
+		}
+		return result;
+	}
 
 	private static int LoadIntHelper(Dictionary<string, object> d, string key)
 	{
@@ -520,33 +448,6 @@ public class TFUtils
 		}
 	}
 
-	    public static T LoadEnum<T>(Dictionary<string, object> d, string key, T defaultValue) where T : struct, Enum
-    {
-        if (d == null || !d.TryGetValue(key, out object value))
-        {
-            return defaultValue;
-        }
-
-        if (value == null)
-        {
-            return defaultValue;
-        }
-
-        string stringValue = value.ToString().Trim();
-        if (string.IsNullOrEmpty(stringValue))
-        {
-            return defaultValue;
-        }
-
-        if (Enum.TryParse<T>(stringValue, true, out T result))
-        {
-            return result;
-        }
-
-        UnityEngine.Debug.LogWarning($"Failed to parse enum value '{stringValue}' for key '{key}'. Using default value {defaultValue}.");
-        return defaultValue;
-    }
-
 	public static float? TryLoadFloat(Dictionary<string, object> data, string key)
 	{
 		if (data.ContainsKey(key))
@@ -563,36 +464,23 @@ public class TFUtils
 
 	public static float LoadFloat(Dictionary<string, object> d, string key, float defaultValue)
 	{
-    	if (d == null || !d.TryGetValue(key, out object value))
-    	{
-        	return defaultValue;
-    	}
-
-    	if (value == null)
-    	{
-        	return defaultValue;
-    	}
-
-    	if (value is float floatValue)
-    	{
-        	return floatValue;
-    	}
-
-    	if (float.TryParse(value.ToString(), out float result))
-    	{
-        	return result;
-    	}
-
-    	UnityEngine.Debug.LogWarning($"TFUtils.LoadFloat: Failed to parse value '{value}' for key '{key}'. Using default value {defaultValue}.");
-    	return defaultValue;
-}
-
+		float result = defaultValue;
+		if (d.ContainsKey(key))
+		{
+			object obj = d[key];
+			if (!(obj is string) || ((string)obj).Length > 0)
+			{
+				result = Convert.ToSingle(obj, CultureInfo.InvariantCulture);
+			}
+		}
+		return result;
+	}
 
 	public static void LoadVector3(out Vector3 v3, Dictionary<string, object> d, float defaultValue)
 	{
-		v3.x = (!d.ContainsKey("x")) ? defaultValue : LoadFloat(d, "x");
-		v3.y = (!d.ContainsKey("y")) ? defaultValue : LoadFloat(d, "y");
-		v3.z = (!d.ContainsKey("z")) ? defaultValue : LoadFloat(d, "z");
+		v3.x = ((!d.ContainsKey("x")) ? defaultValue : LoadFloat(d, "x"));
+		v3.y = ((!d.ContainsKey("y")) ? defaultValue : LoadFloat(d, "y"));
+		v3.z = ((!d.ContainsKey("z")) ? defaultValue : LoadFloat(d, "z"));
 	}
 
 	public static void SaveVector3(Vector3 v3, string name, Dictionary<string, object> d)
@@ -608,8 +496,8 @@ public class TFUtils
 	public static void LoadVector2(out Vector2 v2, Dictionary<string, object> d, float defaultValue)
 	{
 		Assert(!d.ContainsKey("z"), "Don't call LoadVector2 on something that has a z value! (do you want to use LoadVector3?)");
-		v2.x = (!d.ContainsKey("x")) ? defaultValue : LoadFloat(d, "x");
-		v2.y = (!d.ContainsKey("y")) ? defaultValue : LoadFloat(d, "y");
+		v2.x = ((!d.ContainsKey("x")) ? defaultValue : LoadFloat(d, "x"));
+		v2.y = ((!d.ContainsKey("y")) ? defaultValue : LoadFloat(d, "y"));
 	}
 
 	public static void LoadVector3(out Vector3 v3, Dictionary<string, object> d)
@@ -634,15 +522,17 @@ public class TFUtils
 
 	public static Vector2 TruncateVector(Vector3 vector)
 	{
-		return (Vector2)vector;
+		return new Vector2(vector.x, vector.y);
 	}
 
 	public static void TruncateFile(string filePath)
 	{
 		DeleteFile(filePath);
-        using FileStream fileStream = File.Create(filePath);
-        fileStream.Close();
-    }
+		using (FileStream fileStream = File.Create(filePath))
+		{
+			fileStream.Close();
+		}
+	}
 
 	public static void DeleteFile(string filePath)
 	{
