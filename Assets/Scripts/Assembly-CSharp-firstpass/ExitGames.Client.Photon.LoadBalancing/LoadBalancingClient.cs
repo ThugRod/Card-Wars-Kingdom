@@ -408,7 +408,7 @@ namespace ExitGames.Client.Photon.LoadBalancing
 			}
 		}
 
-		public void Service(LoadBalancingPeer loadBalancingPeer)
+		public void Service()
 		{
 			if (loadBalancingPeer != null)
 			{
@@ -995,165 +995,151 @@ namespace ExitGames.Client.Photon.LoadBalancing
 			}
 		}
 
-public virtual void OnStatusChanged(StatusCode statusCode)
-{
-    DebugReturn(DebugLevel.ALL, $"OnStatusChanged called with statusCode: {statusCode}");
-
-    switch (statusCode)
-    {
-        case StatusCode.Connect:
-            inLobby = false;
-            DebugReturn(DebugLevel.ALL, $"Current State: {State}");
-
-            if (State == ClientState.ConnectingToNameServer)
-            {
-                if ((int)loadBalancingPeer.DebugOut >= 5)
-                {
-                    DebugReturn(DebugLevel.ALL, "Connected to nameserver.");
-                }
-                Server = ServerConnection.NameServer;
-                if (AuthValues != null)
-                {
-                    AuthValues.Token = null;
-                }
-            }
-            else if (State == ClientState.ConnectingToGameserver)
-            {
-                if ((int)loadBalancingPeer.DebugOut >= 5)
-                {
-                    DebugReturn(DebugLevel.ALL, "Connected to gameserver.");
-                }
-                Server = ServerConnection.GameServer;
-            }
-            else if (State == ClientState.ConnectingToMasterserver)
-            {
-                if ((int)loadBalancingPeer.DebugOut >= 5)
-                {
-                    DebugReturn(DebugLevel.ALL, "Connected to masterserver.");
-                }
-                Server = ServerConnection.MasterServer;
-            }
-            else
-            {
-                DebugReturn(DebugLevel.ALL, $"Unexpected State: {State}");
-            }
-            loadBalancingPeer.EstablishEncryption();
-            if (IsAuthorizeSecretAvailable)
-            {
-                didAuthenticate = loadBalancingPeer.OpAuthenticate(AppId, AppVersion, AuthValues, CloudRegion, requestLobbyStatistics);
-                if (didAuthenticate)
-                {
-                    State = ClientState.Authenticating;
-                }
-                else
-                {
-                    DebugReturn(DebugLevel.ERROR, "Error calling OpAuthenticateWithToken! Check log output, AuthValues and if you're connected. State: " + State);
-                }
-            }
-            break;
-
-        case StatusCode.EncryptionEstablished:
-            if (Server == ServerConnection.NameServer)
-            {
-                State = ClientState.ConnectedToNameServer;
-            }
-            if (!didAuthenticate && (!IsUsingNameServer || CloudRegion != null))
-            {
-                didAuthenticate = loadBalancingPeer.OpAuthenticate(AppId, AppVersion, AuthValues, CloudRegion, requestLobbyStatistics);
-                if (didAuthenticate)
-                {
-                    State = ClientState.Authenticating;
-                }
-                else
-                {
-                    DebugReturn(DebugLevel.ERROR, "Error calling OpAuthenticate! Did not work. Check log output, AuthValues and if you're connected. State: " + State);
-                }
-            }
-            break;
-
-        case StatusCode.Disconnect:
-            DebugReturn(DebugLevel.ALL, $"Disconnected from server. Current State: {State}");
-            CleanCachedValues();
-            didAuthenticate = false;
-            inLobby = false;
-            switch (State)
-            {
-                case ClientState.Uninitialized:
-                case ClientState.Disconnecting:
-                    if (AuthValues != null)
-                    {
-                        AuthValues.Token = null;
-                    }
-                    State = ClientState.Disconnected;
-                    break;
-                case ClientState.DisconnectingFromGameserver:
-                case ClientState.DisconnectingFromNameServer:
-                    Connect();
-                    break;
-                case ClientState.DisconnectingFromMasterserver:
-                    ConnectToGameServer();
-                    break;
-                default:
-                    DebugReturn(DebugLevel.WARNING, $"Got an unexpected Disconnect in LoadBalancingClient State: {State}");
-                    if (AuthValues != null)
-                    {
-                        AuthValues.Token = null;
-                    }
-                    State = ClientState.Disconnected;
-                    break;
-            }
-            break;
-
-        case StatusCode.DisconnectByServerUserLimit:
-            DebugReturn(DebugLevel.ERROR, "The Photon license's CCU Limit was reached. Server rejected this connection. Wait and re-try.");
-            if (AuthValues != null)
-            {
-                AuthValues.Token = null;
-            }
-            DisconnectedCause = DisconnectCause.DisconnectByServerUserLimit;
-            State = ClientState.Disconnected;
-            break;
-
-        case StatusCode.SecurityExceptionOnConnect:
-        case StatusCode.ExceptionOnConnect:
-            if (AuthValues != null)
-            {
-                AuthValues.Token = null;
-            }
-            DisconnectedCause = DisconnectCause.ExceptionOnConnect;
-            State = ClientState.Disconnected;
-            break;
-
-        case StatusCode.DisconnectByServer:
-            if (AuthValues != null)
-            {
-                AuthValues.Token = null;
-            }
-            DisconnectedCause = DisconnectCause.DisconnectByServer;
-            State = ClientState.Disconnected;
-            break;
-
-        case StatusCode.TimeoutDisconnect:
-            if (AuthValues != null)
-            {
-                AuthValues.Token = null;
-            }
-            DisconnectedCause = DisconnectCause.TimeoutDisconnect;
-            State = ClientState.Disconnected;
-            break;
-
-        case StatusCode.Exception:
-        case StatusCode.ExceptionOnReceive:
-            if (AuthValues != null)
-            {
-                AuthValues.Token = null;
-            }
-            DisconnectedCause = DisconnectCause.Exception;
-            State = ClientState.Disconnected;
-            break;
-    }
-}
-
+		public virtual void OnStatusChanged(StatusCode statusCode)
+		{
+			switch (statusCode)
+			{
+			case StatusCode.Connect:
+				inLobby = false;
+				if (State == ClientState.ConnectingToNameServer)
+				{
+					if ((int)loadBalancingPeer.DebugOut >= 5)
+					{
+						DebugReturn(DebugLevel.ALL, "Connected to nameserver.");
+					}
+					Server = ServerConnection.NameServer;
+					if (AuthValues != null)
+					{
+						AuthValues.Token = null;
+					}
+				}
+				if (State == ClientState.ConnectingToGameserver)
+				{
+					if ((int)loadBalancingPeer.DebugOut >= 5)
+					{
+						DebugReturn(DebugLevel.ALL, "Connected to gameserver.");
+					}
+					Server = ServerConnection.GameServer;
+				}
+				if (State == ClientState.ConnectingToMasterserver)
+				{
+					if ((int)loadBalancingPeer.DebugOut >= 5)
+					{
+						DebugReturn(DebugLevel.ALL, "Connected to masterserver.");
+					}
+					Server = ServerConnection.MasterServer;
+				}
+				loadBalancingPeer.EstablishEncryption();
+				if (IsAuthorizeSecretAvailable)
+				{
+					didAuthenticate = loadBalancingPeer.OpAuthenticate(AppId, AppVersion, AuthValues, CloudRegion, requestLobbyStatistics);
+					if (didAuthenticate)
+					{
+						State = ClientState.Authenticating;
+					}
+					else
+					{
+						DebugReturn(DebugLevel.ERROR, "Error calling OpAuthenticateWithToken! Check log output, AuthValues and if you're connected. State: " + State);
+					}
+				}
+				break;
+			case StatusCode.EncryptionEstablished:
+				if (Server == ServerConnection.NameServer)
+				{
+					State = ClientState.ConnectedToNameServer;
+				}
+				if (!didAuthenticate && (!IsUsingNameServer || CloudRegion != null))
+				{
+					didAuthenticate = loadBalancingPeer.OpAuthenticate(AppId, AppVersion, AuthValues, CloudRegion, requestLobbyStatistics);
+					if (didAuthenticate)
+					{
+						State = ClientState.Authenticating;
+					}
+					else
+					{
+						DebugReturn(DebugLevel.ERROR, "Error calling OpAuthenticate! Did not work. Check log output, AuthValues and if you're connected. State: " + State);
+					}
+				}
+				break;
+			case StatusCode.Disconnect:
+				CleanCachedValues();
+				didAuthenticate = false;
+				inLobby = false;
+				switch (State)
+				{
+				case ClientState.Uninitialized:
+				case ClientState.Disconnecting:
+					if (AuthValues != null)
+					{
+						AuthValues.Token = null;
+					}
+					State = ClientState.Disconnected;
+					break;
+				case ClientState.DisconnectingFromGameserver:
+				case ClientState.DisconnectingFromNameServer:
+					Connect();
+					break;
+				case ClientState.DisconnectingFromMasterserver:
+					ConnectToGameServer();
+					break;
+				default:
+				{
+					string empty = string.Empty;
+					DebugReturn(DebugLevel.WARNING, string.Concat("Got a unexpected Disconnect in LoadBalancingClient State: ", State, ". ", empty));
+					if (AuthValues != null)
+					{
+						AuthValues.Token = null;
+					}
+					State = ClientState.Disconnected;
+					break;
+				}
+				}
+				break;
+			case StatusCode.DisconnectByServerUserLimit:
+				DebugReturn(DebugLevel.ERROR, "The Photon license's CCU Limit was reached. Server rejected this connection. Wait and re-try.");
+				if (AuthValues != null)
+				{
+					AuthValues.Token = null;
+				}
+				DisconnectedCause = DisconnectCause.DisconnectByServerUserLimit;
+				State = ClientState.Disconnected;
+				break;
+			case StatusCode.SecurityExceptionOnConnect:
+			case StatusCode.ExceptionOnConnect:
+				if (AuthValues != null)
+				{
+					AuthValues.Token = null;
+				}
+				DisconnectedCause = DisconnectCause.ExceptionOnConnect;
+				State = ClientState.Disconnected;
+				break;
+			case StatusCode.DisconnectByServer:
+				if (AuthValues != null)
+				{
+					AuthValues.Token = null;
+				}
+				DisconnectedCause = DisconnectCause.DisconnectByServer;
+				State = ClientState.Disconnected;
+				break;
+			case StatusCode.TimeoutDisconnect:
+				if (AuthValues != null)
+				{
+					AuthValues.Token = null;
+				}
+				DisconnectedCause = DisconnectCause.TimeoutDisconnect;
+				State = ClientState.Disconnected;
+				break;
+			case StatusCode.Exception:
+			case StatusCode.ExceptionOnReceive:
+				if (AuthValues != null)
+				{
+					AuthValues.Token = null;
+				}
+				DisconnectedCause = DisconnectCause.Exception;
+				State = ClientState.Disconnected;
+				break;
+			}
+		}
 
 		public virtual void OnEvent(EventData photonEvent)
 		{

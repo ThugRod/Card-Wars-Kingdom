@@ -277,35 +277,36 @@ public class PhotonInterface : LoadBalancingClient
 		base.DebugReturn(level, message);
 	}
 
-public override void OnStatusChanged(StatusCode statusCode)
-{
-    base.OnStatusChanged(statusCode);
-    switch (statusCode)
-    {
-        case StatusCode.Exception:
-        case StatusCode.ExceptionOnReceive:
-        case StatusCode.DisconnectByServer:
-        case StatusCode.DisconnectByServerLogic:
-            if (pvpEventCallback != null)
-            {
-                pvpEventCallback(TBPvPManager.tbPvPEventCode.ErrorDisconnected, null);
-            }
-            break;
-        case StatusCode.ExceptionOnConnect:
-            if (pvpEventCallback != null)
-            {
-                pvpEventCallback(TBPvPManager.tbPvPEventCode.ErrorDisconnected, null);
-            }
-            break;
-        case StatusCode.Disconnect:
-            SavedGames.Clear();
-            if (pvpEventCallback != null)
-            {
-                pvpEventCallback(TBPvPManager.tbPvPEventCode.Disconnected, null);
-            }
-            break;
-    }
-}
+	public override void OnStatusChanged(StatusCode statusCode)
+	{
+		base.OnStatusChanged(statusCode);
+		switch (statusCode)
+		{
+		case StatusCode.Exception:
+		case StatusCode.ExceptionOnReceive:
+		case StatusCode.DisconnectByServer:
+		case StatusCode.DisconnectByServerLogic:
+			if (pvpEventCallback != null)
+			{
+				pvpEventCallback(TBPvPManager.tbPvPEventCode.ErrorDisconnected, null);
+			}
+			break;
+		case StatusCode.ExceptionOnConnect:
+			if (pvpEventCallback != null)
+			{
+				pvpEventCallback(TBPvPManager.tbPvPEventCode.ErrorDisconnected, null);
+			}
+			break;
+		case StatusCode.Disconnect:
+			SavedGames.Clear();
+			if (pvpEventCallback != null)
+			{
+				pvpEventCallback(TBPvPManager.tbPvPEventCode.Disconnected, null);
+			}
+			break;
+		}
+	}
+
 	public void WebRpcGetData(string user_id, RpcGetDataCallback callback)
 	{
 		Dictionary<string, object> dictionary = new Dictionary<string, object>();

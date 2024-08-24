@@ -576,42 +576,22 @@ public class Session
         {
             if (status == HttpStatusCode.OK)
             {
+                Dictionary<string, object> dictionary = (Dictionary<string, object>)data["data"];
                 try
                 {
-                    if (data.ContainsKey("data") && data["data"] is Dictionary<string, object> dictionary)
-                    {
-                        if (dictionary.ContainsKey("server_time"))
-                        {
-                            string serverTimeString = dictionary["server_time"].ToString();
-                            // Adjusting the format to match the server's date format
-                            DateTime serverTime = DateTime.ParseExact(serverTimeString, "ddd, dd MMM yyyy HH:mm:ss 'GMT'", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
-                            TFUtils.UpdateServerTime(serverTime);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Server time key is missing in the response.");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Data key is missing or is not a dictionary.");
-                    }
+                    DateTime serverTime = DateTime.ParseExact(dictionary["server_time"].ToString(), "ddd, dd MMM yyyy HH:mm:ss 'GMT'", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                    TFUtils.UpdateServerTime(serverTime);
                 }
-                catch (FormatException ex)
+                catch (FormatException e)
                 {
-                    Console.WriteLine("Error parsing server time: " + ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("An unexpected error occurred: " + ex.Message);
+                    Debug.LogError("Failed to parse date string: " + dictionary["server_time"].ToString() + " Error: " + e.Message);
                 }
             }
             else
             {
-                Console.WriteLine("Failed to fetch server time. Status code: " + status);
+                Debug.LogError("Failed to get server time. Status: " + status);
             }
         };
-
         Server.GetTime(handler);
     }
 

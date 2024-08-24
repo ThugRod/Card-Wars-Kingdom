@@ -315,58 +315,70 @@ public class SQWebFileServer : TFWebFileServer
 	{
 	}
 
-	public void SaveGameData(string gameData, FileCallbackHandler callback, object userData = null)
-	{
-		Debug.Log("Saving game data from " + playerGameUri);
-		WebHeaderCollection webHeaderCollection = new WebHeaderCollection();
-		SetDefaultHeaders(webHeaderCollection);
-		webHeaderCollection.Add(HttpRequestHeader.ContentType, "application/octet-stream");
-		webHeaderCollection.Add("x-nick-description", WWW.EscapeURL(TFUtils.DeviceName).Replace("+", "%20"));
-		string text = ReadETag();
-		if (text != null)
-		{
-			webHeaderCollection.Add(HttpRequestHeader.IfMatch, text);
-		}
-		try
-		{
-			SaveFile(playerGameUri, gameData, webHeaderCollection, SaveGameCallbackWrapper(callback, gameData, webHeaderCollection, true, userData), userData);
-		}
-		catch (Exception message)
-		{
-			Debug.Log(message);
-		}
-	}
+public void SaveGameData(string gameData, FileCallbackHandler callback, object userData = null)
+{
+    Debug.Log("Saving game data to " + playerGameUri);
+    WebHeaderCollection webHeaderCollection = new WebHeaderCollection();
+    SetDefaultHeaders(webHeaderCollection);
+    webHeaderCollection.Add(HttpRequestHeader.ContentType, "application/octet-stream");
+    webHeaderCollection.Add("x-nick-description", WWW.EscapeURL(TFUtils.DeviceName).Replace("+", "%20"));
+    string eTag = ReadETag();
+    if (eTag != null)
+    {
+        webHeaderCollection.Add(HttpRequestHeader.IfMatch, eTag);
+    }
 
-	public FileCallbackHandler SaveGameCallbackWrapper(FileCallbackHandler callback, string gameData, WebHeaderCollection headers, bool retry, object userData = null)
-	{
-		return delegate(TFWebFileResponse response)
-		{
-			LastSuccessfulSave = DateTime.Now;
-			Debug.Log(string.Concat("Server returned with ", response.StatusCode, " save at :", LastSuccessfulSave));
-			if (retry && SetAuthHeader(response, headers, "PUT"))
-			{
-				try
-				{
-					SaveFile(playerGameUri, gameData, headers, SaveGameCallbackWrapper(callback, gameData, headers, false, userData), userData);
-					return;
-				}
-				catch (Exception message)
-				{
-					Debug.Log(message);
-					return;
-				}
-			}
-			if (response.headers != null)
-			{
-				string text = response.headers[HttpResponseHeader.ETag];
-				if (text != null)
-				{
-					SaveETag(text);
-				}
-			}
-			handleResponse(response, callback);
-		};
-	}
+    try
+    {
+        // Log the game data being sent
+        Debug.Log("Game Data: " + gameData);
+
+        SaveFile(playerGameUri, gameData, webHeaderCollection, SaveGameCallbackWrapper(callback, gameData, webHeaderCollection, true, userData), userData);
+    }
+    catch (Exception ex)
+    {
+        Debug.LogError("Exception while saving game data: " + ex.Message);
+    }
+}
+
+public FileCallbackHandler SaveGameCallbackWrapper(FileCallbackHandler callback, string gameData, WebHeaderCollection headers, bool retry, object userData = null)
+{
+    return delegate(TFWebFileResponse response)
+    {
+        LastSuccessfulSave = DateTime.Now;
+        Debug.Log($"Server returned with {response.StatusCode} save at: {LastSuccessfulSave}");
+
+        if (retry && SetAuthHeader(response, headers, "PUT"))
+        {
+            try
+            {
+                SaveFile(playerGameUri, gameData, headers, SaveGameCallbackWrapper(callback, gameData, headers, false, userData), userData);
+                return;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Exception while retrying save game data: " + ex.Message);
+                return;
+            }
+        }
+
+        if (response.headers != null)
+        {
+            string newETag = response.headers[HttpResponseHeader.ETag];
+            if (newETag != null)
+            {
+                SaveETag(newETag);
+            }
+        }
+
+        if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.Created)
+        {
+            Debug.LogError($"Failed to save game data. Server returned status code: {response.StatusCode}");
+        }
+
+        handleResponse(response, callback);
+    };
+}
 
 	public FileCallbackHandler GetGameCallbackWrapper(FileCallbackHandler callback, WebHeaderCollection headers, bool retry, object userData = null)
 	{

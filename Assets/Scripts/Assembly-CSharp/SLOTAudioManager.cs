@@ -224,33 +224,33 @@ public class SLOTAudioManager : Singleton<SLOTAudioManager>
 
 	public AudioSource PlaySound(AudioSource audiosource, AudioClip audioclip, bool oneshot, bool NoStacking, AudioType audioType = AudioType.SFX)
 	{
-		if (audiosource == null)
-		{
-			return null;
-		}
-		switch (audioType)
-		{
-		case AudioType.SFX:
-			audiosource.volume = soundVolume * .5f;
-			break;
-		case AudioType.VO:
-			audiosource.volume = voVolume;
-			break;
-		case AudioType.Music:
-			audiosource.volume = musicVolume * .5f;
-			break;
-		}
-		audiosource.enabled = true;
-		if (oneshot)
-		{
-			audiosource.PlayOneShot(audioclip);
-		}
-		else if (!NoStacking || !audiosource.isPlaying)
-		{
-			audiosource.clip = audioclip;
-			audiosource.Play();
-		}
-		return audiosource;
+    	if (audiosource == null)
+    	{
+        	return null;
+    	}
+    	switch (audioType)
+    	{
+        	case AudioType.SFX:
+            	audiosource.volume = soundVolume * 50f; // Decreased from 0.5f to 0.4f
+            	break;
+        	case AudioType.VO:
+            	audiosource.volume = voVolume * 50f; // Increased from 1.0f to 1.1f
+            	break;
+        	case AudioType.Music:
+            	audiosource.volume = musicVolume * 50f; // Increased from 0.5f to 0.6f
+            	break;
+    	}
+    	audiosource.enabled = true;
+    	if (oneshot)
+    	{
+        	audiosource.PlayOneShot(audioclip);
+    	}
+    	else if (!NoStacking || !audiosource.isPlaying)
+    	{
+        	audiosource.clip = audioclip;
+        	audiosource.Play();
+    	}
+    	return audiosource;
 	}
 
 	public void PlayRandomSound(string audioClipName, int clips, bool useaudiofolder = true, AudioType audioType = AudioType.SFX)
