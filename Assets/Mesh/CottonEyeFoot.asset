@@ -2,8 +2,12 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!43 &4300000
 Mesh:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: CottonEyeFoot
-  serializedVersion: 8
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -21,48 +25,48 @@ Mesh:
     channels: []
     fullWeights: []
   m_BindPose:
-  - e00: 6.123234E-17
-    e01: -6.123234E-17
+  - e00: 6.123234e-17
+    e01: -6.123234e-17
     e02: -1
     e03: -1.083782
-    e10: -1.509958E-07
+    e10: -0.0000001509958
     e11: -1
-    e12: 6.123234E-17
+    e12: 6.123234e-17
     e13: 0.02685983
     e20: -1
-    e21: 1.509958E-07
-    e22: -6.123235E-17
+    e21: 0.0000001509958
+    e22: -6.123235e-17
     e23: 0.08461212
     e30: 0
     e31: 0
     e32: 0
     e33: 1
-  - e00: 6.123233E-17
-    e01: -6.123233E-17
+  - e00: 6.123233e-17
+    e01: -6.123233e-17
     e02: -0.9999999
     e03: -2.184458
-    e10: -3.258413E-07
+    e10: -0.0000003258413
     e11: -0.9999999
-    e12: 6.123231E-17
+    e12: 6.123231e-17
     e13: 0.02685965
     e20: -1
-    e21: 3.258413E-07
-    e22: -6.123236E-17
+    e21: 0.0000003258413
+    e22: -6.123236e-17
     e23: 0.08461212
     e30: 0
     e31: 0
     e32: 0
     e33: 1
-  - e00: 6.123233E-17
+  - e00: 6.123233e-17
     e01: 0.9999999
-    e02: -6.123233E-17
+    e02: -6.123233e-17
     e03: 0.3906392
     e10: -1
-    e11: 6.123238E-17
-    e12: 4.47035E-07
+    e11: 6.123238e-17
+    e12: 0.000000447035
     e13: 0.1654568
-    e20: 4.47035E-07
-    e21: 6.123232E-17
+    e20: 0.000000447035
+    e21: 6.123232e-17
     e22: 1
     e23: 0.07298272
     e30: 0
@@ -71,15 +75,23 @@ Mesh:
     e33: 1
   m_BoneNameHashes: 6a09f7589d8a16ed93f7b075
   m_RootBoneNameHash: 3977677469
+  m_BonesAABB:
+  - m_Min: {x: -2.2852302, y: -0.95696884, z: -1.5225679}
+    m_Max: {x: 0.55120254, y: 1.2819324, z: 1.2696031}
+  - m_Min: {x: -1.5379833, y: -0.8131187, z: -1.0024935}
+    m_Max: {x: -0.01833415, y: 0.913085, z: 0.98927957}
+  - m_Min: {x: -0.8349252, y: -0.8331257, z: -0.83537334}
+    m_Max: {x: 0.8359512, y: 0.83406234, z: 0.8355032}
+  m_VariableBoneCountWeights:
+    m_Data: 
   m_MeshCompression: 3
   m_IsReadable: 0
-  m_KeepVertices: 1
-  m_KeepIndices: 1
+  m_KeepVertices: 0
+  m_KeepIndices: 0
   m_IndexFormat: 0
-  m_IndexBuffer:
-  m_Skin: []
+  m_IndexBuffer: 
   m_VertexData:
-    m_CurrentChannels: 0
+    serializedVersion: 3
     m_VertexCount: 0
     m_Channels:
     - stream: 0
@@ -114,8 +126,32 @@ Mesh:
       offset: 0
       format: 0
       dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
     m_DataSize: 0
-    _typelessdata:
+    _typelessdata: 
   m_CompressedMesh:
     m_Vertices:
       m_NumItems: 3150
@@ -133,13 +169,13 @@ Mesh:
       m_NumItems: 0
       m_Range: 0
       m_Start: 0
-      m_Data:
+      m_Data: 
       m_BitSize: 0
     m_Tangents:
       m_NumItems: 0
       m_Range: 0
       m_Start: 0
-      m_Data:
+      m_Data: 
       m_BitSize: 0
     m_Weights:
       m_NumItems: 1182
@@ -147,17 +183,17 @@ Mesh:
       m_BitSize: 5
     m_NormalSigns:
       m_NumItems: 0
-      m_Data:
+      m_Data: 
       m_BitSize: 0
     m_TangentSigns:
       m_NumItems: 0
-      m_Data:
+      m_Data: 
       m_BitSize: 0
     m_FloatColors:
       m_NumItems: 0
       m_Range: 0
       m_Start: 0
-      m_Data:
+      m_Data: 
       m_BitSize: 0
     m_BoneIndices:
       m_NumItems: 1182
@@ -172,6 +208,14 @@ Mesh:
     m_Center: {x: 0.2115512, y: -0.1362648, z: -0.4828271}
     m_Extent: {x: 1.395628, y: 1.118888, z: 1.683297}
   m_MeshUsageFlags: 1
-  m_BakedConvexCollisionMesh:
-  m_BakedTriangleCollisionMesh:
-  m_MeshOptimized: 1
+  m_CookingOptions: 30
+  m_BakedConvexCollisionMesh: 
+  m_BakedTriangleCollisionMesh: 
+  m_MeshMetrics[0]: 1
+  m_MeshMetrics[1]: 1
+  m_MeshOptimizationFlags: -1
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 

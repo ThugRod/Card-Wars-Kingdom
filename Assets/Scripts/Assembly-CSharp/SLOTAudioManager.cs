@@ -231,13 +231,13 @@ public class SLOTAudioManager : Singleton<SLOTAudioManager>
     	switch (audioType)
     	{
         	case AudioType.SFX:
-            	audiosource.volume = soundVolume * 50f; // Decreased from 0.5f to 0.4f
+            	audiosource.volume = soundVolume * 1.0f; // Decreased from 0.5f to 0.4f
             	break;
         	case AudioType.VO:
-            	audiosource.volume = voVolume * 50f; // Increased from 1.0f to 1.1f
+            	audiosource.volume = voVolume * 1.0f; // Increased from 1.0f to 1.1f
             	break;
         	case AudioType.Music:
-            	audiosource.volume = musicVolume * 50f; // Increased from 0.5f to 0.6f
+            	audiosource.volume = musicVolume * 1.0f; // Increased from 0.5f to 0.6f
             	break;
     	}
     	audiosource.enabled = true;

@@ -31245,11 +31245,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df7e6ab337270fa4f9d3db2ff61f6255, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  apiKey: 78acc50b32476c8f2065701add1c25d9
-  Domain: kungfufactory.helpshift.com
-  iOS_AppID: kungfufactory_platform_20160604065840625-77b694e36bd646e
-  Android_AppID: kungfufactory_platform_20160604065840638-575cf298cef57e4
-  userID: 
 --- !u!114 &14470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31911,9 +31906,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gui_audiosource: {fileID: 7302}
-  soundVolume: 1
-  voVolume: 1
-  musicVolume: 1
+  soundVolume: 0.8
+  voVolume: 0.8
+  musicVolume: 0.8
   VoEventCooldowns:
   - Event: 3
     Cooldown: 15
