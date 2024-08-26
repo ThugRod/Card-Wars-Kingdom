@@ -53,5 +53,5 @@
         "Temp/": true
     },
     "dotnet.preferCSharpExtension": true,
-    "dotnet.defaultSolution": "CardWarsKingdom.sln"
+    "dotnet.defaultSolution": "Card-Wars-Kingdom.sln"
 }
