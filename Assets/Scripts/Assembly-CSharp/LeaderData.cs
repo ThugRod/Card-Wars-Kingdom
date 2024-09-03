@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using CodeStage.AntiCheat.ObscuredTypes;
+using UnityEngine;
 
 public class LeaderData : ILoadableData
 {
@@ -329,100 +330,104 @@ public class LeaderData : ILoadableData
 
 	public void Populate(Dictionary<string, object> dict)
 	{
-		AlternateSkins = new List<LeaderData>();
-		_ID = TFUtils.LoadString(dict, "ID", string.Empty);
-		_Name = TFUtils.LoadLocalizedString(dict, "Name", string.Empty);
-		_Desc = TFUtils.LoadLocalizedString(dict, "Desc", string.Empty);
-		_Prefab = TFUtils.LoadString(dict, "Prefab", string.Empty);
-		_CharacterOffsetX = TFUtils.LoadFloat(dict, "CharacterOffsetX", 0f);
-		_CharacterOffsetY = TFUtils.LoadFloat(dict, "CharacterOffsetY", 0f);
-		_UseChair = TFUtils.LoadBool(dict, "UseChair", true);
-		_ChairOffsetX = TFUtils.LoadFloat(dict, "ChairOffsetX", 0f);
-		_ChairOffsetY = TFUtils.LoadFloat(dict, "ChairOffsetY", 0f);
-		_Hand = TFUtils.LoadString(dict, "Hand", string.Empty);
-		_PortraitTexture = "UI/FTUEBundle/Icons_Leaders/" + TFUtils.LoadString(dict, "PortraitTexture", string.Empty);
-		_QuestPortraitTexture = "UI/Icons_Leagues/" + TFUtils.LoadString(dict, "QuestPortraitTexture", string.Empty);
-		_CameraWinAnim = TFUtils.LoadString(dict, "CameraWinAnim", string.Empty);
-		_PIPTransformP1 = TFUtils.LoadString(dict, "PIPTransformP1", string.Empty);
-		_PIPTransformP2 = TFUtils.LoadString(dict, "PIPTransformP2", string.Empty);
-		_CardRemoveAnimTime = (float)TFUtils.LoadInt(dict, "CardRemoveAnimTime", 1) / 30f;
-		_CardPlayAnimTime = (float)TFUtils.LoadInt(dict, "CardPlayAnimTime", 1) / 30f;
-		_BigCardPlayAnimTime = (float)TFUtils.LoadInt(dict, "BigCardPlayAnimTime", 1) / 30f;
-		_FlvAge = TFUtils.LoadLocalizedString(dict, "Age", string.Empty);
-		_FlvHeight = TFUtils.LoadLocalizedString(dict, "Height", string.Empty);
-		_FlvWeight = TFUtils.LoadLocalizedString(dict, "Weight", string.Empty);
-		_FlvSpecies = TFUtils.LoadLocalizedString(dict, "Species", string.Empty);
-		_FlvQuote = TFUtils.LoadLocalizedString(dict, "Quote", string.Empty);
-		_HeightAdjust = TFUtils.LoadFloat(dict, "HeightAdjust", 0f);
-		_Playable = TFUtils.LoadBool(dict, "Playable", false);
-		_BuyCost = TFUtils.LoadInt(dict, "BuyCost", 0);
-		_APThreshold = TFUtils.LoadInt(dict, "APThreshold", 100);
-		BuyableSkin = TFUtils.LoadBool(dict, "BuyableSkin", false);
-		SkinBuyCost = TFUtils.LoadInt(dict, "SkinBuyCost", 0);
-		VO = TFUtils.LoadString(dict, "VO", null);
-		VSScreenBackground = "UI/Textures/PlayerBackdrops/" + TFUtils.LoadString(dict, "VSScreenBackground", string.Empty);
-		ThoughtBubbleHeightAdjust = TFUtils.LoadFloat(dict, "ThoughtBubbleHeightAdjust", 0f);
-		string text = TFUtils.LoadString(dict, "LeaderVFX", null);
-		if (text != null)
-		{
-			_LeaderVFX = LeaderVFXDataManager.Instance.GetData(text);
-		}
-		if (_CardPlayAnimTime < _CardRemoveAnimTime)
-		{
-			_CardPlayAnimTime = _CardRemoveAnimTime;
-		}
-		if (_BigCardPlayAnimTime < _CardPlayAnimTime)
-		{
-			_BigCardPlayAnimTime = _CardPlayAnimTime;
-		}
-		for (int i = 1; i <= 5; i++)
-		{
-			string iD = TFUtils.LoadString(dict, "ActionCard" + i, string.Empty);
-			_ActionCards[i - 1] = CardDataManager.Instance.GetData(iD);
-			if (_ActionCards[i - 1] == null)
-			{
-			}
-		}
-		for (int j = 1; j <= 7; j++)
-		{
-			string value = TFUtils.LoadString(dict, "Combo" + j, "Colorless");
-			_AttackCombo[j - 1] = (CreatureFaction)(int)Enum.Parse(typeof(CreatureFaction), value, true);
-		}
-		string text2 = TFUtils.LoadString(dict, "SkinOf", null);
-		if (text2 != null)
-		{
-			LeaderData data = LeaderDataManager.Instance.GetData(text2);
-			if (data != null)
-			{
-				SkinParentLeader = data;
-				data.AlternateSkins.Add(this);
-			}
-		}
-		int num = 1;
-		while (true)
-		{
-			string text3 = TFUtils.LoadString(dict, "SaleStartDate" + num, null);
-			string text4 = TFUtils.LoadString(dict, "SaleEndDate" + num, null);
-			if (text3 != null && text3.ToLower() == "always")
-			{
-				AlwaysAvailable = true;
-				AvailableDates = null;
-				break;
-			}
-			if (AvailableDates == null)
-			{
-				AvailableDates = new List<StartEndDate>();
-			}
-			if (text3 == null || text4 == null)
-			{
-				break;
-			}
-			StartEndDate startEndDate = new StartEndDate();
-			startEndDate.StartDate = DateTime.ParseExact(text3, "M/d/yyyy", CultureInfo.InvariantCulture);
-			startEndDate.EndDate = DateTime.ParseExact(text4, "M/d/yyyy", CultureInfo.InvariantCulture);
-			AvailableDates.Add(startEndDate);
-			num++;
-		}
+    	// Log the stack trace to identify where this method is being called from
+    	Debug.Log("Populate method called. Stack Trace: " + Environment.StackTrace);
+
+    	AlternateSkins = new List<LeaderData>();
+    	_ID = TFUtils.LoadString(dict, "ID", string.Empty);
+    	_Name = TFUtils.LoadLocalizedString(dict, "Name", string.Empty);
+    	_Desc = TFUtils.LoadLocalizedString(dict, "Desc", string.Empty);
+    	_Prefab = TFUtils.LoadString(dict, "Prefab", string.Empty);
+    	_CharacterOffsetX = TFUtils.LoadFloat(dict, "CharacterOffsetX", 0f);
+    	_CharacterOffsetY = TFUtils.LoadFloat(dict, "CharacterOffsetY", 0f);
+    	_UseChair = TFUtils.LoadBool(dict, "UseChair", true);
+    	_ChairOffsetX = TFUtils.LoadFloat(dict, "ChairOffsetX", 0f);
+    	_ChairOffsetY = TFUtils.LoadFloat(dict, "ChairOffsetY", 0f);
+    	_Hand = TFUtils.LoadString(dict, "Hand", string.Empty);
+    	_PortraitTexture = "UI/FTUEBundle/Icons_Leaders/" + TFUtils.LoadString(dict, "PortraitTexture", string.Empty);
+    	_QuestPortraitTexture = "UI/Icons_Leagues/" + TFUtils.LoadString(dict, "QuestPortraitTexture", string.Empty);
+    	_CameraWinAnim = TFUtils.LoadString(dict, "CameraWinAnim", string.Empty);
+    	_PIPTransformP1 = TFUtils.LoadString(dict, "PIPTransformP1", string.Empty);
+    	_PIPTransformP2 = TFUtils.LoadString(dict, "PIPTransformP2", string.Empty);
+    	_CardRemoveAnimTime = (float)TFUtils.LoadInt(dict, "CardRemoveAnimTime", 1) / 30f;
+    	_CardPlayAnimTime = (float)TFUtils.LoadInt(dict, "CardPlayAnimTime", 1) / 30f;
+    	_BigCardPlayAnimTime = (float)TFUtils.LoadInt(dict, "BigCardPlayAnimTime", 1) / 30f;
+    	_FlvAge = TFUtils.LoadLocalizedString(dict, "Age", string.Empty);
+    	_FlvHeight = TFUtils.LoadLocalizedString(dict, "Height", string.Empty);
+    	_FlvWeight = TFUtils.LoadLocalizedString(dict, "Weight", string.Empty);
+    	_FlvSpecies = TFUtils.LoadLocalizedString(dict, "Species", string.Empty);
+    	_FlvQuote = TFUtils.LoadLocalizedString(dict, "Quote", string.Empty);
+    	_HeightAdjust = TFUtils.LoadFloat(dict, "HeightAdjust", 0f);
+    	_Playable = TFUtils.LoadBool(dict, "Playable", false);
+    	_BuyCost = TFUtils.LoadInt(dict, "BuyCost", 0);
+    	_APThreshold = TFUtils.LoadInt(dict, "APThreshold", 100);
+    	BuyableSkin = TFUtils.LoadBool(dict, "BuyableSkin", false);
+    	SkinBuyCost = TFUtils.LoadInt(dict, "SkinBuyCost", 0);
+    	VO = TFUtils.LoadString(dict, "VO", null);
+    	VSScreenBackground = "UI/Textures/PlayerBackdrops/" + TFUtils.LoadString(dict, "VSScreenBackground", string.Empty);
+    	ThoughtBubbleHeightAdjust = TFUtils.LoadFloat(dict, "ThoughtBubbleHeightAdjust", 0f);
+    	string text = TFUtils.LoadString(dict, "LeaderVFX", null);
+    	if (text != null)
+    	{
+        	_LeaderVFX = LeaderVFXDataManager.Instance.GetData(text);
+    	}
+    	if (_CardPlayAnimTime < _CardRemoveAnimTime)
+    	{
+        	_CardPlayAnimTime = _CardRemoveAnimTime;
+    	}
+    	if (_BigCardPlayAnimTime < _CardPlayAnimTime)
+    	{
+        	_BigCardPlayAnimTime = _CardPlayAnimTime;
+    	}
+    	for (int i = 1; i <= 5; i++)
+    	{
+        	string iD = TFUtils.LoadString(dict, "ActionCard" + i, string.Empty);
+        	_ActionCards[i - 1] = CardDataManager.Instance.GetData(iD);
+        	if (_ActionCards[i - 1] == null)
+        	{
+           	 Debug.LogWarning($"ActionCard{i} not found for Leader: {_ID}");
+        	}
+    	}
+    	for (int j = 1; j <= 7; j++)
+    	{
+        	string value = TFUtils.LoadString(dict, "Combo" + j, "Colorless");
+        	_AttackCombo[j - 1] = (CreatureFaction)(int)Enum.Parse(typeof(CreatureFaction), value, true);
+    	}
+    	string text2 = TFUtils.LoadString(dict, "SkinOf", null);
+    	if (text2 != null)
+    	{
+        	LeaderData data = LeaderDataManager.Instance.GetData(text2);
+        	if (data != null)
+        	{
+            	SkinParentLeader = data;
+            	data.AlternateSkins.Add(this);
+        	}
+    	}
+    	int num = 1;
+    	while (true)
+    	{
+        	string text3 = TFUtils.LoadString(dict, "SaleStartDate" + num, null);
+        	string text4 = TFUtils.LoadString(dict, "SaleEndDate" + num, null);
+        	if (text3 != null && text3.ToLower() == "always")
+        	{
+            	AlwaysAvailable = true;
+            	AvailableDates = null;
+            	break;
+        	}
+        	if (AvailableDates == null)
+        	{
+            	AvailableDates = new List<StartEndDate>();
+        	}
+        	if (text3 == null || text4 == null)
+        	{
+            	break;
+        	}
+        	StartEndDate startEndDate = new StartEndDate();
+        	startEndDate.StartDate = DateTime.ParseExact(text3, "M/d/yyyy", CultureInfo.InvariantCulture);
+        	startEndDate.EndDate = DateTime.ParseExact(text4, "M/d/yyyy", CultureInfo.InvariantCulture);
+        	AvailableDates.Add(startEndDate);
+        	num++;
+    	}
 	}
 
 	public void ParseKeywords()

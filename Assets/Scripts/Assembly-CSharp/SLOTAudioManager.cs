@@ -65,7 +65,7 @@ public class SLOTAudioManager : Singleton<SLOTAudioManager>
 
 	private AudioListener listener;
 
-	public float soundVolume = 1f;
+	public float soundVolume = 1.0f;
 
 	public float voVolume = 1f;
 
@@ -231,13 +231,14 @@ public class SLOTAudioManager : Singleton<SLOTAudioManager>
     	switch (audioType)
     	{
         	case AudioType.SFX:
-            	audiosource.volume = soundVolume * 1.0f; // Decreased from 0.5f to 0.4f
+            	audiosource.volume = soundVolume * 1.0f;
+				Debug.Log($"SFX Volume Applied: {audiosource.volume}");
             	break;
         	case AudioType.VO:
-            	audiosource.volume = voVolume * 1.0f; // Increased from 1.0f to 1.1f
+            	audiosource.volume = voVolume * 1.0f;
             	break;
         	case AudioType.Music:
-            	audiosource.volume = musicVolume * 1.0f; // Increased from 0.5f to 0.6f
+            	audiosource.volume = musicVolume * 1.0f; 
             	break;
     	}
     	audiosource.enabled = true;
@@ -550,6 +551,7 @@ public class SLOTAudioManager : Singleton<SLOTAudioManager>
 		{
 			switch (leader.VO)
 			{
+				case "PeppermintButler":
 				case "IceKing":
 				case "Lemongrab":
 				case "LumpySpacePrincess":
@@ -574,6 +576,7 @@ public class SLOTAudioManager : Singleton<SLOTAudioManager>
 		{
 			switch (leader.VO)
 			{
+				case "PeppermintButler":
 				case "IceKing":
 				case "Finn":
 				case "LumpySpacePrincess":
@@ -600,6 +603,7 @@ public class SLOTAudioManager : Singleton<SLOTAudioManager>
 		{
 			switch (leader.VO)
 			{
+				case "PeppermintButler":
 				case "Finn":
 				case "PrincessBubblegum":
 					PlayRandomSound(text, 11, false, AudioType.VO);
@@ -630,6 +634,7 @@ public class SLOTAudioManager : Singleton<SLOTAudioManager>
 		{
 			switch (leader.VO)
 			{
+				case "PeppermintButler":
 				case "FlamePrincess":
 				case "LumpySpacePrincess":
 				case "PrincessBubblegum":

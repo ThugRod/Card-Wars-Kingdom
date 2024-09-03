@@ -303,8 +303,15 @@ public class StoreScreenController : Singleton<StoreScreenController>
 
 	private void PopulateHeroList()
 	{
-		mHeroList = new List<LeaderData>(LeaderDataManager.Instance.GetDatabase().FindAll((LeaderData m) => m.ShowInSaleList()));
-		mHeroGridDataSource.Init(HeroGrid, HeroPrefab, mHeroList);
+    	mHeroList = new List<LeaderData>(LeaderDataManager.Instance.GetDatabase().FindAll((LeaderData m) => m.ShowInSaleList()));
+
+    	// Debugging log to check if Leader_PeppermintButler_01 is included
+    	foreach (var leader in mHeroList)
+    	{
+        	Debug.Log($"Leader in Hero List: {leader.Name}, ID: {leader.ID}");
+    	}
+
+    	mHeroGridDataSource.Init(HeroGrid, HeroPrefab, mHeroList);
 	}
 
 	private void PopulateSkinList()
@@ -954,47 +961,89 @@ public class StoreScreenController : Singleton<StoreScreenController>
 		PopulateLeader(heroTile.Leader);
 	}
 
-	private void PopulateLeader(LeaderData leader)
+
+	private void PopulatePeppermintButlerActionCards(LeaderData leader)
 	{
-		mHighlightedLeader = leader;
-		HeroName.text = leader.Name;
-		HeroAge.text = leader.FlvAge;
-		HeroHeight.text = leader.FlvHeight;
-		HeroWeight.text = leader.FlvWeight;
-		HeroSpecies.text = leader.FlvSpecies;
-		HeroCost.text = leader.BuyCost.ToString();
-		Singleton<SLOTResourceManager>.Instance.QueueUITextureLoad(leader.PortraitTexture, "FTUEBundle", "UI/UI/LoadingPlaceholder", HeroImage);
+		//Debugging log to check if this method is functioning
+		Debug.Log($"Populating PeppermintButler ActionCards for Leader: {leader.Name}, ID: {leader.ID}");
+
 		UnloadCards();
-		for (int i = 0; i < 5; i++)
+
+		//Assuming PepermintButler has a unique set of action cards
+		for (int i = 0; i < leader.ActionCards.Count; i++)
 		{
 			CardPrefabScript component = HeroCardNodes[i].InstantiateAsChild(Singleton<PrefabReferences>.Instance.Card).GetComponent<CardPrefabScript>();
 			component.gameObject.ChangeLayer(base.gameObject.layer);
 			component.Mode = CardPrefabScript.CardMode.GeneralFrontEnd;
+
+			//Debugging log to chekc the card being populated
+			Debug.Log($"Populating PeppermintButler Card: {leader.ActionCards[i].Name}, Texture Path: {leader.ActionCards[i].UITexture}");
+
 			component.Populate(leader.ActionCards[i]);
 			component.AdjustDepth(1);
 			mSpawnedCards.Add(component);
 		}
-		bool flag = Singleton<PlayerInfoScript>.Instance.IsLeaderUnlocked(leader);
-		HeroPurchaseButton.SetActive(!flag);
-		mHeroGridDataSource.RepopulateObjects();
-		if (!leader.AlwaysAvailable && !flag)
-		{
-			StartEndDate activeAvailablePeriod = leader.GetActiveAvailablePeriod();
-			if (activeAvailablePeriod != null)
-			{
-				TimeSpan timeSpan = activeAvailablePeriod.EndDate - TFUtils.ServerTime;
-				HeroAvailableLabel.text = KFFLocalization.Get("!!AVAILABLE_FOR_X").Replace("<val1>", PlayerInfoScript.FormatTimeString((int)timeSpan.TotalSeconds));
-			}
-			else
-			{
-				HeroAvailableLabel.text = string.Empty;
-			}
-		}
-		else
-		{
-			HeroAvailableLabel.text = string.Empty;
-		}
 	}
+
+private void PopulateLeader(LeaderData leader)
+{
+    mHighlightedLeader = leader;
+
+    // Debugging log to check which leader is being populated
+    Debug.Log($"Populating Leader: {leader.Name}, ID: {leader.ID}");
+
+    HeroName.text = leader.Name;
+    HeroAge.text = leader.FlvAge;
+    HeroHeight.text = leader.FlvHeight;
+    HeroWeight.text = leader.FlvWeight;
+    HeroSpecies.text = leader.FlvSpecies;
+    HeroCost.text = leader.BuyCost.ToString();
+    Singleton<SLOTResourceManager>.Instance.QueueUITextureLoad(leader.PortraitTexture, "FTUEBundle", "UI/UI/LoadingPlaceholder", HeroImage);
+
+    // Check if the leader is PeppermintButler and call the specific method
+    if (leader.ID == "Leader_PeppermintButler")
+    {
+        PopulatePeppermintButlerActionCards(leader);
+    }
+    else
+    {
+        UnloadCards();
+        for (int i = 0; i < 5; i++)
+        {
+            CardPrefabScript component = HeroCardNodes[i].InstantiateAsChild(Singleton<PrefabReferences>.Instance.Card).GetComponent<CardPrefabScript>();
+            component.gameObject.ChangeLayer(base.gameObject.layer);
+            component.Mode = CardPrefabScript.CardMode.GeneralFrontEnd;
+
+            // Debugging log to check the card being populated
+            Debug.Log($"Populating Card: {leader.ActionCards[i].Name}, Texture Path: {leader.ActionCards[i].UITexture}");
+
+            component.Populate(leader.ActionCards[i]);
+            component.AdjustDepth(1);
+            mSpawnedCards.Add(component);
+        }
+    }
+
+    bool flag = Singleton<PlayerInfoScript>.Instance.IsLeaderUnlocked(leader);
+    HeroPurchaseButton.SetActive(!flag);
+    mHeroGridDataSource.RepopulateObjects();
+    if (!leader.AlwaysAvailable && !flag)
+    {
+        StartEndDate activeAvailablePeriod = leader.GetActiveAvailablePeriod();
+        if (activeAvailablePeriod != null)
+        {
+            TimeSpan timeSpan = activeAvailablePeriod.EndDate - TFUtils.ServerTime;
+            HeroAvailableLabel.text = KFFLocalization.Get("!!AVAILABLE_FOR_X").Replace("<val1>", PlayerInfoScript.FormatTimeString((int)timeSpan.TotalSeconds));
+        }
+        else
+        {
+            HeroAvailableLabel.text = string.Empty;
+        }
+    }
+    else
+    {
+        HeroAvailableLabel.text = string.Empty;
+    }
+}
 
 	public void OnClickPurchaseHero()
 	{

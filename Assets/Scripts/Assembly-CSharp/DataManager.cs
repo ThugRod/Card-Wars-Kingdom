@@ -163,6 +163,10 @@ public abstract class DataManager<T> : IDataManager where T : ILoadableData
 			try
 			{
 				doneLoadingAndParsingJsonData = false;
+
+				// Log the file path or URL being used to load the JSON data
+            	Debug.Log($"Loading JSON data from: {appliedFilePath}");
+
 				try
 				{
 					List<object> jlist = (List<object>)Json.Deserialize(wwwText);

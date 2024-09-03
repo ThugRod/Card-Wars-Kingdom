@@ -263,6 +263,9 @@ public class CardData : ILoadableData
 
 	public void Populate(Dictionary<string, object> dict)
 	{
+		// Log the card ID, Name, and UITexture being populated
+		Debug.Log($"Populating CardData: ID = {TFUtils.LoadString(dict, "ID", string.Empty)}, Name = {TFUtils.LoadLocalizedString(dict, "Name", string.Empty)}, UITexture = {TFUtils.LoadString(dict, "UITexture", string.Empty)}. Stack Trace: {Environment.StackTrace}");
+
 		Type typeFromHandle = typeof(TargetFilters);
 		ID = TFUtils.LoadString(dict, "ID", string.Empty);
 		Name = TFUtils.LoadLocalizedString(dict, "Name", string.Empty);

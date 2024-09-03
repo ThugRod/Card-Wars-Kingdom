@@ -231,6 +231,9 @@ public class CardPrefabScript : UIStreamingGridListItem
 		if (dataObj is CardData)
 		{
 			mCard = dataObj as CardData;
+
+			// Debugging log to check the card data being populated
+			Debug.Log($"Populating Card: {mCard.Name}, Texture Path: {mCard.UITexture}");
 			if (Mode == CardMode.Opponent)
 			{
 				mShowingBack = true;
@@ -288,59 +291,77 @@ public class CardPrefabScript : UIStreamingGridListItem
 
 	private void PopulateFront()
 	{
-		CardBackSprite.gameObject.SetActive(false);
-		Frame.gameObject.SetActive(true);
-		CakeFrame.gameObject.SetActive(false);
-		if (mCard != null)
-		{
-			Art.gameObject.SetActive(true);
-			Singleton<SLOTResourceManager>.Instance.QueueUITextureLoad(mCard.UITexture, mCard.AssetBundle, "UI/UI/LoadingPlaceholder", Art);
-			Frame.ReplaceTexture(mCard.CardFrame);
-			Name.text = mCard.Name;
-			ActionType.text = mCard.TypeText;
-			mCard.BuildDescriptionString(Text, mBaseColorString);
-			FlavorText.text = string.Empty;
-			Cost.text = mCard.Cost.ToString();
-		}
-		else if (mCreature != null)
-		{
-			Art.gameObject.SetActive(true);
-			Art.ReplaceTexture(mCreature.Form.PortraitTexture);
-			Frame.ReplaceTexture(mCreature.Form.Faction.CreatureFrameTexture());
-			Name.text = mCreature.Form.Name;
-			ActionType.text = mCreature.Form.GetClassString();
-			Text.text = string.Empty;
-			Cost.text = mCreature.Form.DeployCost.ToString();
-			if (Singleton<PlayerInfoScript>.Instance.StateData.HelperCreature != null && Singleton<PlayerInfoScript>.Instance.StateData.HelperCreature.Creature == mCreature)
-			{
-				HelperLabel.SetActive(true);
-			}
-		}
-		else if (mEvoMaterial != null)
-		{
-			CardBackSprite.gameObject.SetActive(false);
-			Frame.gameObject.SetActive(true);
-			Frame.ReplaceTexture(mEvoMaterial.CardFrame);
-			Art.gameObject.SetActive(true);
-			Art.ReplaceTexture(mEvoMaterial.UITexture);
-			Name.text = mEvoMaterial.Name;
-			ActionType.text = string.Empty;
-			Text.text = string.Empty;
-			Cost.text = string.Empty;
-		}
-		else if (mXPMaterial != null)
-		{
-			CardBackSprite.gameObject.SetActive(false);
-			Frame.gameObject.SetActive(false);
-			CakeFrame.gameObject.SetActive(true);
-			CakeFrame.ReplaceTexture(mXPMaterial.UICardFrame);
-			Art.gameObject.SetActive(true);
-			Art.ReplaceTexture(mXPMaterial.UITexture);
-			Name.text = mXPMaterial.Name;
-			ActionType.text = string.Empty;
-			Text.text = string.Empty;
-			Cost.text = string.Empty;
-		}
+    	CardBackSprite.gameObject.SetActive(false);
+    	Frame.gameObject.SetActive(true);
+    	CakeFrame.gameObject.SetActive(false);
+
+    	if (mCard != null)
+    	{
+        	Art.gameObject.SetActive(true);
+
+        	// Debugging log to check the texture path
+        	Debug.Log($"Loading texture for card: {mCard.Name}, Texture Path: {mCard.UITexture}");
+
+        	// Load the card's art texture
+        	Singleton<SLOTResourceManager>.Instance.QueueUITextureLoad(mCard.UITexture, mCard.AssetBundle, "UI/UI/LoadingPlaceholder", Art);
+
+        	// Debugging log to check the frame texture
+        	Debug.Log($"Loading frame texture for card: {mCard.Name}, Frame Path: {mCard.CardFrame}");
+
+        	// Load the card's frame texture
+        	Frame.ReplaceTexture(mCard.CardFrame);
+
+        	// Set the card's name, action type, and description
+        	Name.text = mCard.Name;
+        	ActionType.text = mCard.TypeText;
+
+        	// Debugging log to check the card description
+        	Debug.Log($"Setting description for card: {mCard.Name}, Description: {mCard.Description}");
+
+        	mCard.BuildDescriptionString(Text, mBaseColorString);
+        	FlavorText.text = string.Empty;
+        	Cost.text = mCard.Cost.ToString();
+    	}
+    	else if (mCreature != null)
+    	{
+        	Art.gameObject.SetActive(true);
+        	Art.ReplaceTexture(mCreature.Form.PortraitTexture);
+        	Frame.ReplaceTexture(mCreature.Form.Faction.CreatureFrameTexture());
+        	Name.text = mCreature.Form.Name;
+        	ActionType.text = mCreature.Form.GetClassString();
+        	Text.text = string.Empty;
+        	Cost.text = mCreature.Form.DeployCost.ToString();
+
+        	if (Singleton<PlayerInfoScript>.Instance.StateData.HelperCreature != null && Singleton<PlayerInfoScript>.Instance.StateData.HelperCreature.Creature == mCreature)
+        	{
+            	HelperLabel.SetActive(true);
+        	}
+    	}
+    	else if (mEvoMaterial != null)
+    	{
+        	CardBackSprite.gameObject.SetActive(false);
+        	Frame.gameObject.SetActive(true);
+        	Frame.ReplaceTexture(mEvoMaterial.CardFrame);
+        	Art.gameObject.SetActive(true);
+        	Art.ReplaceTexture(mEvoMaterial.UITexture);
+        	Name.text = mEvoMaterial.Name;
+        	ActionType.text = string.Empty;
+        	Text.text = string.Empty;
+        	Cost.text = string.Empty;
+    	}
+    	else if (mXPMaterial != null)
+    	{
+        	CardBackSprite.gameObject.SetActive(false);
+        	Frame.gameObject.SetActive(false);
+        	CakeFrame.gameObject.SetActive(true);
+        	CakeFrame.ReplaceTexture(mXPMaterial.UICardFrame);
+        	Art.gameObject.SetActive(true);
+        	Art.ReplaceTexture(mXPMaterial.UITexture);
+        	Name.text = mXPMaterial.Name;
+        	ActionType.text = string.Empty;
+        	Text.text = string.Empty;
+        	Cost.text = string.Empty;
+    	}
 	}
 
 	public void ShowBack()

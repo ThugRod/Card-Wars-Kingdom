@@ -100,18 +100,28 @@ public class LoadingManager : Singleton<LoadingManager>
 
 	private IEnumerator LoadAllCo()
 	{
-		foreach (IDataManager ldr in LoadableList)
-		{
-			if (ldr != null)
-			{
-				Debug.Log("LoadingManager -- Loading " + ldr.ToString());
-				yield return StartCoroutine(ldr.Load());
-			}
-		}
-		if (OnFinishedCallback != null)
-		{
-			OnFinishedCallback();
-		}
+    	foreach (IDataManager ldr in LoadableList)
+    	{
+        	if (ldr != null)
+        	{
+            	// Assuming each IDataManager has a FilePath property
+            	var dataManager = ldr as DataManager<ILoadableData>;
+            	if (dataManager != null)
+            	{
+                	Debug.Log($"LoadingManager -- Loading {ldr.ToString()} with FilePath: {dataManager.FilePath}");
+            	}
+            	else
+            	{
+                	Debug.Log($"LoadingManager -- Loading {ldr.ToString()}");
+            	}
+
+            	yield return StartCoroutine(ldr.Load());
+        	}
+    	}
+    	if (OnFinishedCallback != null)
+    	{
+        	OnFinishedCallback();
+    	}
 	}
 
 	public void UnloadAll()
