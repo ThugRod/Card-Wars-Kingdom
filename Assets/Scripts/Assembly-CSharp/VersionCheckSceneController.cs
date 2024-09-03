@@ -81,37 +81,48 @@ public class VersionCheckSceneController : MonoBehaviour
 			}
 			else
 			{
-				string text3 = null;
-				string text4 = null;
-				string text5 = TFUtils.TryLoadString(dictionary, "maintenance_mode");
+				string game_version = null;
+				string latest_version_file = null;
+				string releases_url = null;
+				bool is_in_maintenance = TFUtils.TryLoadString(dictionary, "maintenance_mode") == "yes";
 				string msg = TFUtils.TryLoadString(dictionary, "message");
 				string icon = TFUtils.TryLoadString(dictionary, "icon");
+				icon = icon == "" ? null : icon;
 				bool canClick = TFUtils.TryLoadString(dictionary, "clickable") == "yes";
-				if (text5 == "yes")
+				if (is_in_maintenance)
 				{
 					ShowUpdateMessage(msg, canClick, null, icon);
 					return;
 				}
-				if (Application.platform == RuntimePlatform.Android)
+                game_version = TFUtils.TryLoadString(dictionary, "version");
+				Debug.Log("Server version is: " + game_version);
+                releases_url = TFUtils.TryLoadString(dictionary, "releases_url");
+                releases_url += "/download/v" + game_version + "/";
+                Debug.Log("Releases url is: " + releases_url);
+                if (Application.platform == RuntimePlatform.Android)
 				{
-					text3 = TFUtils.TryLoadString(dictionary, "android_version");
-					text4 = TFUtils.TryLoadString(dictionary, "android_url");
-				}
-				if (text3 == null)
+                    latest_version_file = releases_url + "CardWarsKingdom-v" + game_version + "-Android.apk";
+                    
+				} else if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
 				{
-					text3 = TFUtils.TryLoadString(dictionary, "version");
-					text4 = TFUtils.TryLoadString(dictionary, "pc_url");
-				}
-				if (text3 != null)
+                    latest_version_file = releases_url + "Card.Wars.Kingdom-v" + game_version + "-PC.zip";
+                }
+				Debug.Log("Latest version for platform is: " + latest_version_file);
+				// Maybe add linux support later???
+                
+				if (game_version != null)
 				{
-					Version version = new Version(text3);
+					Version version = new Version(game_version);
+					Debug.Log("Current Application Version is: " + Application.version);
 					if (version > new Version(Application.version))
 					{
 						msg = KFFLocalization.Get("!!GAME_OUTDATED");
-						ShowUpdateMessage(msg, canClick, text4, icon);
+						Debug.Log("Game is outdated!");
+						ShowUpdateMessage(msg, canClick, latest_version_file, icon);
 						return;
 					}
 				}
+				
 			}
 		}
 		if (!string.IsNullOrEmpty(text))

@@ -2485,6 +2485,7 @@ public class PlayerInfoScript : Singleton<PlayerInfoScript>
 
 	public bool HasUnclaimedCalendarGift()
 	{
+		// @TODO: Server trusts everything that the client says, without question
 		DateTime serverTime = TFUtils.ServerTime;
 		DateTime dateTime = new DateTime(serverTime.Year, serverTime.Month, serverTime.Day);
 		DateTime dateTime2 = new DateTime(SaveData.LastOneTimeCalendarDateClaimed.Year, SaveData.LastOneTimeCalendarDateClaimed.Month, SaveData.LastOneTimeCalendarDateClaimed.Day);
