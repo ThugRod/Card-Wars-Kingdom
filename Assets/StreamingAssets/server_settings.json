@@ -1,7 +1,7 @@
 {
     "type" : "server_settings",
     "server_url" : "https://thugrod.pythonanywhere.com/",
-    "local_server_url" : "http://127.0.0.1:5000/",
+    "local_server_url" : "http://127.0.0.1:8080/",
     "photon_chat_app_id": "3a545407-24d0-4904-90a0-588575508d99",
     "photon_pun_app_id": "2e7623d0-ef16-4901-8e5b-4b1f33406773"
 }
