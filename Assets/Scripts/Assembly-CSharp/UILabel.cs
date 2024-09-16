@@ -308,43 +308,48 @@ public class UILabel : UIWidget
 		}
 	}
 
-	public string text
-	{
-		get
-		{
-			return mText;
-		}
-		set
-		{
-			if (mText == value)
-			{
-				return;
-			}
-			if (string.IsNullOrEmpty(value))
-			{
-				if (!string.IsNullOrEmpty(mText))
-				{
-					mText = string.Empty;
-					MarkAsChanged();
-					ProcessAndRequest();
-				}
-			}
-			else if (mText != value)
-			{
-				mText = value;
-				MarkAsChanged();
-				ProcessAndRequest();
-			}
-			if (autoResizeBoxCollider)
-			{
-				ResizeCollider();
-			}
-			if (LabelShadow != null)
-			{
-				LabelShadow.RefreshShadowLabel();
-			}
-		}
-	}
+    public string text
+    {
+        get
+        {
+            return mText;
+        }
+        set
+        {
+            if (mText == value)
+            {
+                return;
+            }
+            if (string.IsNullOrEmpty(value))
+            {
+                if (!string.IsNullOrEmpty(mText))
+                {
+                    mText = string.Empty;
+                    MarkAsChanged();
+                    ProcessAndRequest();
+                }
+            }
+            else if (mText != value)
+            {
+                mText = value;
+                MarkAsChanged();
+                ProcessAndRequest();
+            }
+            if (autoResizeBoxCollider)
+            {
+                ResizeCollider();
+            }
+            if (LabelShadow != null)
+            {
+                LabelShadow.RefreshShadowLabel();
+            }
+        }
+    }
+
+	    public void SetCopyUserIdLabel()
+    {
+        text = "Copy User ID";
+    }
 
 	public int defaultFontSize
 	{

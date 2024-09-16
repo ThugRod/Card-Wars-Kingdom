@@ -2,173 +2,189 @@ using System;
 using System.Collections.Generic;
 using Multiplayer;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TownSettingsController : Singleton<TownSettingsController>
 {
-	public enum OptionTypeKPI
-	{
-		Music,
-		SFX,
-		CameraTilt,
-		Language
-	}
+    public enum OptionTypeKPI
+    {
+        Music,
+        SFX,
+        CameraTilt,
+        Language
+    }
 
-	public UITweenController ShowTween;
+    public UITweenController ShowTween;
 
-	public UITweenController HideTween;
+    public UITweenController HideTween;
 
-	public UITweenController ShowMenuTween;
+    public UITweenController ShowMenuTween;
 
-	public UITweenController HideMenuTween;
+    public UITweenController HideMenuTween;
 
-	public UILabel PlayerName;
+    public UILabel PlayerName;
 
-	public UILabel PlayerID;
+    public UILabel PlayerID;
 
-	public UILabel ButtonConnectLabel;
+    public UILabel ButtonConnectLabel;
 
-	public GameObject PrivacyPolicyButton;
+    public GameObject PrivacyPolicyButton;
 
-	public UIGrid ButtonsParent;
+    public UIGrid ButtonsParent;
 
-	public GameObject FaqButton;
+    public GameObject FaqButton;
 
-	public GameObject DragonStonesButton;
+    public GameObject DragonStonesButton;
 
-	public GameObject SctlButton;
+    public GameObject SctlButton;
 
-	public GameObject SettlementsButton;
+    public GameObject SettlementsButton;
 
-	public GameObject FacebookButton;
+    public GameObject CopyUserIdButton;
 
-	public UITexture LeaderTex;
+    public UITexture LeaderTex;
 
-	public UILabel versionLbl;
+    public UILabel versionLbl;
 
-	public UIPopupList langList;
+    public UIPopupList langList;
 
-	public PopupListLocalizationKeys langListPopupKeys;
+    public PopupListLocalizationKeys langListPopupKeys;
 
-	public UILabel langLbl;
+    public UILabel langLbl;
 
-	private string mLeaderName;
 
-	private bool mAudioInitialized;
+    private string mLeaderName;
 
-	private float mMusicVol;
+    private bool mAudioInitialized;
 
-	private float mSoundVol;
+    private float mMusicVol;
 
-	private bool mTiltCam;
+    private float mSoundVol;
+
+    private bool mTiltCam;
 
 	public static List<string> langeSettingList = new List<string> { "ENGLISH", "SPANISH", "FRENCH", "ITALIAN", "JAPANESE", "KOREAN", "PORTUGUESE", "RUSSIAN", "TURKISH" };
 
 	public UIToggle AccountViewToggle;
 
-	public UIToggle OptionsToggle;
+    public UIToggle OptionsToggle;
 
-	public UIToggle HelpToggle;
+    public UIToggle HelpToggle;
 
-	public GameObject[] TogglePanels;
+    public GameObject[] TogglePanels;
 
-	private UIToggle mCurrentToggle;
+    private UIToggle mCurrentToggle;
 
-	public GameObject MusicButtonOn;
+    public GameObject MusicButtonOn;
 
-	public GameObject MusicButtonOff;
+    public GameObject MusicButtonOff;
 
-	public GameObject SoundButtonOn;
+    public GameObject SoundButtonOn;
 
-	public GameObject SoundButtonOff;
+    public GameObject SoundButtonOff;
 
-	public GameObject TiltCamButtonOn;
+    public GameObject TiltCamButtonOn;
 
-	public GameObject TiltCamButtonOff;
+    public GameObject TiltCamButtonOff;
 
-	private bool isTabInitialized;
+    private bool isTabInitialized;
+    public bool Privacy = true;
+    public bool Custom;
 
-	public bool Privacy = true;
+    private string LinkPrivacy = "http://www.cartoonnetwork.com/legal/priv_tou.html#textBox_priv_a";
+    private string LinkTerms = "http://www.cartoonnetwork.com/legal/priv_tou.html#textBox_priv_a";
+    public string LinkCustom;
 
-	public bool Custom;
+    public static ResponseFlag CodeRedeemFlag { get; set; }
 
-	private string LinkPrivacy = "http://www.cartoonnetwork.com/legal/priv_tou.html#textBox_priv_a";
+    private void Start()
+    {
+        showVersionNumber();
+        langListPopupKeys.LocalizedKeys = new List<string>();
+        for (int i = 0; i < langeSettingList.Count; i++)
+        {
+            langListPopupKeys.LocalizedKeys.Add("!!" + langeSettingList[i]);
+        }
+        UpdateLangListPosition();
 
-	private string LinkTerms = "http://www.cartoonnetwork.com/legal/priv_tou.html#textBox_priv_a";
+        // Connect the CopyUserIdButton to the CopyUserIdToClipboard method
+        if (CopyUserIdButton != null)
+        {
+            CopyUserIdButton.GetComponent<Button>().onClick.AddListener(CopyUserIdToClipboard);
+        }
+    }
 
-	public string LinkCustom;
-
-	public static ResponseFlag CodeRedeemFlag { get; set; }
-
-	private void Start()
-	{
-		showVersionNumber();
-		langListPopupKeys.LocalizedKeys = new List<string>();
-		for (int i = 0; i < langeSettingList.Count; i++)
-		{
-			langListPopupKeys.LocalizedKeys.Add("!!" + langeSettingList[i]);
-		}
-		UpdateLangListPosition();
-	}
+    public void CopyUserIdToClipboard()
+    {
+        if (PlayerID != null)
+        {
+            GUIUtility.systemCopyBuffer = PlayerID.text;
+            Debug.Log("User ID Copied to Clipboard: " + PlayerID.text);
+        }
+    }
 
 	private void OnApplicationPause(bool pauseStatus)
 	{
 	}
 
-	public void Show()
-	{
-		ShowTween.Play();
-		if (FaqButton != null)
-		{
-			FaqButton.SetActive(true);
-		}
-		if (DragonStonesButton != null)
-		{
-			DragonStonesButton.SetActive(false);
-		}
-		if (SctlButton != null)
-		{
-			SctlButton.SetActive(false);
-		}
-		if (SettlementsButton != null)
-		{
-			SettlementsButton.SetActive(false);
-		}
-		FacebookButton.SetActive(false);
-		if (ButtonsParent != null)
-		{
-			ButtonsParent.Reposition();
-		}
-		Singleton<HelpScreenController>.Instance.Populate();
-		mTiltCam = Singleton<PlayerInfoScript>.Instance.SaveData.TownTiltCam;
-		mMusicVol = Singleton<SLOTAudioManager>.Instance.musicVolume;
-		mSoundVol = Singleton<SLOTAudioManager>.Instance.soundVolume;
-		if (mTiltCam)
-		{
-			ToggleTiltCamOn();
-		}
-		else
-		{
-			ToggleTiltCamOff();
-		}
-		if (mMusicVol > 0f)
-		{
-			ToggleMusicOn();
-		}
-		else
-		{
-			ToggleMusicOff();
-		}
-		if (mSoundVol > 0f)
-		{
-			ToggleSoundOn();
-		}
-		else
-		{
-			ToggleSoundOff();
-		}
-		UpdatePanelState();
-	}
-
+    public void Show()
+    {
+        ShowTween.Play();
+        if (FaqButton != null)
+        {
+            FaqButton.SetActive(true);
+        }
+        if (DragonStonesButton != null)
+        {
+            DragonStonesButton.SetActive(false);
+        }
+        if (SctlButton != null)
+        {
+            SctlButton.SetActive(false);
+        }
+        if (SettlementsButton != null)
+        {
+            SettlementsButton.SetActive(false);
+        }
+        if (CopyUserIdButton != null)
+        {
+            CopyUserIdButton.SetActive(true);
+        }
+        if (ButtonsParent != null)
+        {
+            ButtonsParent.Reposition();
+        }
+        Singleton<HelpScreenController>.Instance.Populate();
+        mTiltCam = Singleton<PlayerInfoScript>.Instance.SaveData.TownTiltCam;
+        mMusicVol = Singleton<SLOTAudioManager>.Instance.musicVolume;
+        mSoundVol = Singleton<SLOTAudioManager>.Instance.soundVolume;
+        if (mTiltCam)
+        {
+            ToggleTiltCamOn();
+        }
+        else
+        {
+            ToggleTiltCamOff();
+        }
+        if (mMusicVol > 0f)
+        {
+            ToggleMusicOn();
+        }
+        else
+        {
+            ToggleMusicOff();
+        }
+        if (mSoundVol > 0f)
+        {
+            ToggleSoundOn();
+        }
+        else
+        {
+            ToggleSoundOff();
+        }
+        UpdatePanelState();
+    }
+	
 	public void OnClickClose()
 	{
 		if (mTiltCam != Singleton<PlayerInfoScript>.Instance.SaveData.TownTiltCam || mMusicVol != Singleton<SLOTAudioManager>.Instance.musicVolume || mSoundVol != Singleton<SLOTAudioManager>.Instance.soundVolume)
@@ -219,13 +235,13 @@ public class TownSettingsController : Singleton<TownSettingsController>
 		}
 	}
 
-	private void UpdatePanelState()
-	{
-		PlayerInfoScript instance = Singleton<PlayerInfoScript>.Instance;
-		PlayerID.text = instance.GetFormattedPlayerCode();
-		PlayerName.text = instance.GetPlayerName();
-		ButtonConnectLabel.text = KFFLocalization.Get((!instance.IsFacebookLogin()) ? "!!FB_CONNECT_BUTTON" : "!!FB_LOGOUT");
-	}
+    private void UpdatePanelState()
+    {
+        PlayerInfoScript instance = Singleton<PlayerInfoScript>.Instance;
+        PlayerID.text = instance.GetFormattedPlayerCode();
+        PlayerName.text = instance.GetPlayerName();
+        ButtonConnectLabel.text = KFFLocalization.Get((!instance.IsFacebookLogin()) ? "!!FB_CONNECT_BUTTON" : "!!FB_LOGOUT");
+    }
 
 	public void OnClickCustomize()
 	{
